@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Agent - Standard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+        /* 1. Global Reset & Theme (Light) */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body {
+            /* Subtle modern gradient background */
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            /* Dark text for visibility on light bg */
+            color: #0f172a; 
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* 2. Main Center Panel (App Container) */
+        .app-container {
+            /* Light Glassmorphism with slight border */
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 3rem;
+            border-radius: 28px;
+            /* Deeper shadow for "appealing" floating effect */
+            box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+            /* Entry Animation */
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        /* 3. Avatar Styling (Enhanced & Appealing) */
+        .avatar {
+            width: 100px;
+            height: 100px;
+            /* Keep rich gradient but adjust accent */
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 1.5rem;
+            /* Enhanced, smoother glow */
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        /* 4. Animations */
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* listening state - smoother pulse on light bg */
+        .avatar.listening { animation: pulseSmooth 1.8s infinite; transform: scale(1.05); }
+        
+        @keyframes pulseSmooth {
+            0% { box-shadow: 0 10px 30px 0px rgba(99,102,241, 0.6); }
+            70% { box-shadow: 0 10px 30px 25px rgba(99,102,241, 0); }
+            100% { box-shadow: 0 10px 30px 0px rgba(99,102,241, 0.6); }
+        }
+
+        /* 5. Typography & Status (Enhanced Visibility) */
+        h2 { font-weight: 800; font-size: 2rem; margin-bottom: 0.5rem; color: #0f172a; }
+        
+        /* Subtle indicator colors */
+        .status { font-weight: 600; font-size: 0.9rem; margin-bottom: 2.5rem; letter-spacing: 1.2px; text-transform: uppercase; }
+        /* Colors defined dynamically in JS (Ready: green, Thinking: amber, etc.) */
+
+        /* 6. Controls (Updated for Light Theme) */
+        .controls { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+        
+        select, input, button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            outline: none;
+            font-size: 1rem;
+            /* Light backgrounds for controls */
+            background: rgba(255, 255, 255, 0.6);
+            color: #0f172a; /* Dark text */
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        /* Subtle focus outlines */
+        select:focus, input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        
+        /* 7. Buttons (Attractive Styling) */
+        button { background: #6366f1; color: white; font-weight: 700; cursor: pointer; border: none; }
+        button:hover { background: #4f46e5; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3); }
+        
+        /* Stop/Send specialized styling */
+        .btn-stop { background: #ef4444; }
+        .btn-stop:hover { background: #dc2626; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); }
+
+        /* 8. Text Input Divider */
+        .divider { display: flex; align-items: center; text-align: center; color: #64748b; margin: 15px 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 2px solid rgba(0, 0, 0, 0.06); }
+        .divider::before { margin-right: 1em; }
+        .divider::after { margin-left: 1em; }
+
+        /* 9. Chat Bubble (Appealing visibility on light bg) */
+        .chat-bubble {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 1.2rem;
+            border-radius: 16px;
+            margin-top: 25px;
+            font-size: 1rem;
+            color: #1e293b; /* Stronger dark text */
+            text-align: left;
+            display: none;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            line-height: 1.5;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.03);
+            
+            /* Entry animation for new messages */
+            animation: messageSlideIn 0.5s ease-out;
+        }
+        
+        @keyframes messageSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="avatar" id="avatar">🤖</div>
+    <h2>AI Assistant</h2>
+    <div class="status" id="status" style="color: #10b981;">● System Ready</div>
+
+    <div class="controls">
+        <select id="langSelect">
+            <option value="en-US">English</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="ta-IN">Tamil</option>
+        </select>
+        
+        <button id="startBtn">🎙️ Hold to Speak</button>
+        <button id="stopBtn" class="btn-stop" style="display: none;">🛑 Stop & Send</button>
+        
+        <div class="divider">OR TYPE</div>
+        
+        <input type="text" id="textInput" placeholder="Book a meeting at 3pm...">
+        <button id="sendTextBtn">Send Message</button>
+    </div>
+
+    <div class="chat-bubble" id="chatBubble"></div>
+</div>
+
+<script>
+    // --- YOUR EXISTING AGENT LOGIC (Updated Status Colors) ---
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const sendTextBtn = document.getElementById('sendTextBtn');
+    const statusText = document.getElementById('status');
+    const chatBubble = document.getElementById('chatBubble');
+    const avatar = document.getElementById('avatar');
+    const langSelect = document.getElementById('langSelect');
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        
+        startBtn.onclick = () => {
+            recognition.lang = langSelect.value;
+            recognition.start();
+            statusText.innerText = "\u25cf Listening...";
+            statusText.style.color = "#3b82f6"; /* Modern Blue */
+            avatar.classList.add('listening');
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'block';
+        };
+
+        stopBtn.onclick = () => recognition.stop();
+
+        recognition.onresult = async (event) => {
+            const text = event.results[0][0].transcript;
+            showChat(`<strong>You:</strong> "${text}"`);
+            await processRequest(text);
+        };
+
+        recognition.onerror = () => resetUI("\u25cf Microphone Error", "#ef4444");
+        recognition.onend = () => resetUI();
+    } else {
+        startBtn.style.display = 'none';
+    }
+
+    sendTextBtn.onclick = async () => {
+        const text = document.getElementById('textInput').value;
+        if (!text) return;
+        showChat(`<strong>You:</strong> "${text}"`);
+        document.getElementById('textInput').value = '';
+        await processRequest(text);
+    };
+
+    async function processRequest(text) {
+        statusText.innerText = "\u25cf Thinking...";
+        statusText.style.color = "#f59e0b"; /* Amber */
+        avatar.classList.add('listening');
+        
+        try {
+            // *** MAKE SURE THIS IS YOUR PRODUCTION WEBHOOK URL WHEN DEPLOYING ***
+            const response = await fetch('https://n8n-production-ce8e.up.railway.app/webhook/voice-booking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+            statusText.innerText = "\u25cf Replying...";
+            statusText.style.color = "#8b5cf6"; /* Purple */
+            
+            showChat(`<strong>You:</strong> "${text}"<br><br><strong>AI:</strong> "${data.reply}"`);
+            
+            // Speak the reply
+            const utterance = new SpeechSynthesisUtterance(data.reply);
+            utterance.lang = langSelect.value;
+            utterance.onend = () => resetUI("\u25cf System Ready", "#10b981");
+            window.speechSynthesis.speak(utterance);
+
+        } catch (error) {
+            resetUI("\u25cf Connection Failed", "#ef4444");
+        }
+    }
+
+    function showChat(msg) {
+        chatBubble.style.display = 'block';
+        chatBubble.innerHTML = msg;
+    }
+
+    function resetUI(status = "\u25cf System Ready", color = "#10b981") {
+        statusText.innerText = status;
+        statusText.style.color = color;
+        avatar.classList.remove('listening');
+        startBtn.style.display = 'block';
+        stopBtn.style.display = 'none';
+    }
+</script>
+</body>
+</html>
