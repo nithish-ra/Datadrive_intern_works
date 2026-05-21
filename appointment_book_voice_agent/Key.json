@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "helical-bongo-496909-k0",
+  "private_key_id": "8da91cce44fc33666bda6a684d6f3cfe7a8259ff",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDJNcHfBR1AbkE8\nqq/NoLM9WGZdLDjdKXVKwWg1Q9BxaRWsoGNG5hgE1HnbpArhcOcaN0+0n7fvqyTk\nfSaTcWpOsPD5+7iGauRSENkl2vF1LTl5eHMpvm4OVpCL+fMqFMjlX1hXQEbl86nM\nO9vguO8qHWz4DzrdES2QGF7ItFnoxPGKYkWTrL/d+SgfWmVJABnEPbUmGrh9BXL5\nsJ/qSSBrXeltgQJTkOnJt279SXSy1IhjheC3c2WU2u50AyerGfp93lU+Q0lws+XP\nCdefGee0Y6pfn8O5gfD+nwJyoutPEhnqkPxy4PnHQuFmeCIhXVPbhtui1DgGyWgO\ns7gLRLGTAgMBAAECggEAC2BkPVFjNYTmYGFAPm6jI8lPRF5fOrYA4UCtPTG/4+Gu\nrYuGAXi6C+/dkfsk+FkzX+qXsZ1EP6NcGyUuXLDRc3CSt3exl7wMe81jEb5e36K2\neLVEQax4OYxQcPGpe4wgTcPF0W0bdR4BUEBkLsEWGLoAMshdqikx+8888Lktyjja\nyplBdjwxFaFgHeY1n8sXmVPqEuThgMiXVgLPrpYPck8Xfj4eEdY/+TdiKaw96wO8\nUFo8QKNmwUFIo7qY/TuYC2GQSk5TVeURF4ebgDoq52HFpixWI2HqxYP5g/I7U4RY\nmHB+/ih96rPdAZNwEHQs71al4HehhWBUCSvfF5csgQKBgQDlywjjJ9Tg5X/7hHgw\nJK2iYYLb3xA0nU2HDj0FUR7t6VcTQRaGjN7k+fa1KEDW1I3OzgjjH5yWHDsxZvqQ\n354YM3vazTw+E7EX1vUhbCg36DhIyrz7IO9flT3xg98YtFRPhuEbfBbif0V5J/AC\nBKVQ6Gifa8vF3uOiBr3GFldZEwKBgQDgKDgdeTxEICG6a6zNVtgNcnI2ChNL1VlV\nehIKWlBdhfZE/+qm46e0Fhe/qoR7g7pRiJmnfEwpRde9iJznFcfcJMJ2TipWestC\ni71QsBUnUFHcNsGrbSXZiudVZyGN4XlaRt8je9EHaZTC49M2eBqJW0KhARNudY+p\nzy2Te8zVgQKBgQDiKRrdHpW4pod4jx8PGvo9Z8U4CulTL0JfWtcZxYYwV0hY7eVy\nlXDGYXG7SBvQlC/hSwyaJMGjR7PGYnjXXw6k+P68EORqoEzajriBpYZLx+SlV8v5\nSafuJd9qNQS8traH8tLYjx+i2eoRXQotok7mO2bFCH3sh/r3u7TJIbHkOwKBgB0d\nHCy30lwG0FqmIYuJ/AXDF5JtPJRc4X14nV8627VJ8PKFSrTiXKXHOM5sF0jzkv+D\n/nECc+HocFztoXNiINM28wrqnBUfXccG30/bjuPMStWPRxg81O2sXN96xaDn6BsR\nmWnCayPLUsb9UDGC5+9vKvg+a4etPTuQ7Rp6ueABAoGAAUcKiTEUjpbTciRHKhgY\npvtEx0pYnRgWyrtoO/RXKbQKcF6lhynY9Fc5FjnA1c9lk3HYP2Op1tMRoRyqxhci\n/g4MkyEeXzLCjgoNxPPwDxoVd5iW/vUuU+AL7yT9Syj/VIRDR4/DlB75OsRDMoGH\nGjDKbqCVBUBYm2vCo/uQvrk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "voice-agent-calendar@helical-bongo-496909-k0.iam.gserviceaccount.com",
+  "client_id": "102447372291010469907",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/voice-agent-calendar%40helical-bongo-496909-k0.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
