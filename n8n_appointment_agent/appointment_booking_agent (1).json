@@ -1,0 +1,477 @@
+{
+  "name": "appointment_booking_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "voice-booking",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -832,
+        -160
+      ],
+      "id": "f28d6d51-507b-4dbf-b076-d5713f3b8690",
+      "name": "Webhook",
+      "webhookId": "2b1daea9-c490-4fbd-9b07-2751a552958e"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.1-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.1-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an advanced backend brain for a multilingual voice appointment booking system.\n\nUSER'S VOICE MESSAGE:\n{{ $('Webhook').item.json.body.message }}\n\nCURRENT SYSTEM TIME: {{ $now }}\nUSER TIMEZONE: India Standard Time (IST)\n\nYOUR CALENDAR DATA:\n{{ JSON.stringify($json) }}\n\nINSTRUCTIONS:\n1. BOOK: Check for conflicts. If open, calculate the exact start_datetime and end_datetime in LOCAL IST TIME (e.g. 3 PM = 15:00:00). DO NOT convert to UTC.\n2. CANCEL: Find the EXACT matching event in the Calendar Data and extract its \"id\" to use as event_id.\n3. UPDATE: Find the exact event_id of the existing meeting, AND calculate the NEW start_datetime and end_datetime in LOCAL IST TIME. DO NOT convert to UTC.\n4. CHECK_AVAILABILITY: Look at the calendar and list a few open times tomorrow.\n5. CLARIFY: If a booking conflicts with an existing event, politely suggest an alternative open time.\n6. YOU MUST ALWAYS WRITE A \"speak_reply\". NEVER LEAVE IT BLANK.\n\nOUTPUT FORMAT (Respond ONLY with valid JSON, no markdown):\n{\n  \"intent\": \"BOOK\" or \"CANCEL\" or \"UPDATE\" or \"CLARIFY\" or \"CHECK_AVAILABILITY\",\n  \"start_datetime\": \"YYYY-MM-DDTHH:MM:SS\" (or null),\n  \"end_datetime\": \"YYYY-MM-DDTHH:MM:SS\" (or null),\n  \"name\": \"Name of the person\" (or null),\n  \"event_id\": \"The exact Google Calendar ID\" (or null),\n  \"speak_reply\": \"Your natural spoken response confirming the action.\"\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        -160
+      ],
+      "id": "21917142-cd0c-4f80-a5f8-b7e34cd00cbe",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "18eEqEuAV0243BcZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "BOOK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "eb0ceb40-d76b-436f-b461-ff0b480d771e"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8a344510-4cb5-4bad-bec1-eda206ac0b18",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "CANCEL",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6c89fe2d-ea04-4017-8e90-428b00f0b778",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "UPDATE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bdb046af-c8b7-4b75-b35f-7e2aae4ff621",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "CLARIFY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ff94def4-7c6f-4208-b350-f1dd60817021",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "CHECK_AVAILABILITY",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        -192
+      ],
+      "id": "9f5c3562-e1e1-4654-b848-e0b1f0731332",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "nithishra1906@gmail.com",
+          "mode": "list",
+          "cachedResultName": "nithishra1906@gmail.com"
+        },
+        "start": "={{ $json.start_datetime }}",
+        "end": "={{ $json.end_datetime }}",
+        "additionalFields": {
+          "summary": "={{ $json.name }}'s Appointment"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        -672
+      ],
+      "id": "42a9f769-9ef4-4c9b-a0bd-751bb08553a6",
+      "name": "Create an event",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "5nqDTWIjm1qRhv2a",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"reply\": \"{{ $node['Code in JavaScript'].json.speak_reply }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        960,
+        -96
+      ],
+      "id": "84dbe612-3323-41bc-960d-377b5bb5efa0",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Grab the text exactly where Gemini put it\nconst rawText = $input.first().json.content.parts[0].text;\n\n// Clean up any weird formatting and turn it into real data\nconst cleanText = rawText.replace(/```json|```/g, '').trim();\nreturn JSON.parse(cleanText);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        -160
+      ],
+      "id": "8c2aae77-9496-458d-8c26-20839d9bde0f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "nithishra1906@gmail.com",
+          "mode": "list",
+          "cachedResultName": "nithishra1906@gmail.com"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -608,
+        -160
+      ],
+      "id": "ce953e68-3481-40cc-bbe1-963ada1c5ee8",
+      "name": "Get many events",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "5nqDTWIjm1qRhv2a",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "nithishra1906@gmail.com",
+          "mode": "list",
+          "cachedResultName": "nithishra1906@gmail.com"
+        },
+        "eventId": "={{ $json.event_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        -464
+      ],
+      "id": "9dff8443-f945-407c-b77a-bf5e1d0c8f6d",
+      "name": "Delete an event",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "5nqDTWIjm1qRhv2a",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "nithishra1906@gmail.com",
+          "mode": "list",
+          "cachedResultName": "nithishra1906@gmail.com"
+        },
+        "eventId": "={{ $json.event_id }}",
+        "updateFields": {
+          "end": "={{ $json.end_datetime }}",
+          "start": "={{ $json.start_datetime }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        -256
+      ],
+      "id": "aa7f870e-32af-4c79-97c1-f5c94be8682c",
+      "name": "Update an event",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "5nqDTWIjm1qRhv2a",
+          "name": "Google Calendar account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete an event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update an event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete an event": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update an event": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "f4167371-858b-4803-94cb-2d3e544e440b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3b93c401094cef3b5a97dd8b02301ff8517674dcaff649ece1a2a4139285855"
+  },
+  "id": "V9nvSsiViUz2Fru6",
+  "tags": []
+}
