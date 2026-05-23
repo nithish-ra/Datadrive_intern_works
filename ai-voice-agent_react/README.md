@@ -1,16 +1,30 @@
-# React + Vite
+# 🤖 AI Voice Agent - Appointment Booking Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sleek, responsive React application built with Vite that serves as the frontend for an AI-powered voice booking agent. This app allows users to book, cancel, or update calendar appointments using natural language voice commands or text, and visualizes real-time Google Calendar availability in a dynamic 5-day grid.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+*   **🎙️ Voice-to-Text & Text Input:** Users can hold the microphone button to speak their requests (using the native Web Speech API) or type them manually.
+*   **🗣️ Text-to-Speech:** The AI assistant reads its responses aloud to create a seamless conversational experience.
+*   **📅 Live 5-Day Availability Grid:** Displays a responsive, side-by-side calendar dashboard fetching real-time data from Google Calendar.
+*   **🔄 Smart Pagination:** Easily navigate between previous and future weeks.
+*   **⏳ Past-Date Filtering:** Automatically hides past dates based on the user's local system time to prevent accidental historical bookings.
+*   **🎨 Premium UI/UX:** Features a modern glassmorphism design, interactive hover states, dynamic red/green slot statuses, and animated AI thinking/listening states.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **Framework:** [React](https://reactjs.org/) (via [Vite](https://vitejs.dev/))
+*   **Styling:** Pure CSS (Flexbox/CSS Grid, Glassmorphism)
+*   **Voice Integration:** Native Browser `SpeechRecognition` & `SpeechSynthesis` APIs
+*   **Backend dependency:** Designed to connect to custom **n8n** webhook workflows (handling Gemini AI logic and Google Calendar API connections).
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your machine. You will also need your **n8n** backend workflows actively running to process the webhooks.
+
+### 1. Installation
+Clone the repository and navigate into the frontend folder:
+```bash
+cd ai-voice-agent_react
+npm install
