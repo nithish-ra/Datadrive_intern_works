@@ -1,0 +1,438 @@
+{
+  "name": "n8n-Triage-Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "readStatus": "unread"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b69e5203-8e7d-466a-9fc1-9006c68b9a05",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vIIVtrDtHvttYKE3",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.snippet }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "patient_name",
+              "description": "The full name of the patient"
+            },
+            {
+              "name": "age",
+              "type": "number",
+              "description": "The age of the patient"
+            },
+            {
+              "name": "symptoms",
+              "description": "The primary medical complaints or symptoms"
+            },
+            {
+              "name": "duration",
+              "description": "How long the patient has had the symptoms"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "dbfb4a91-e6dc-42f8-a60d-f193c55d93f2",
+      "name": "Information Extractor"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        240
+      ],
+      "id": "8f2747d0-3bdf-4ccf-911f-5885fdb92aaf",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "18eEqEuAV0243BcZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"You are a clinical data validation agent. Analyze the incoming JSON object containing patient triage details.\n\nPerform these operations and output a clean JSON response with these exact keys:\n\nsanitized_name: Keep the patient's first name, but replace the last name with just its first initial to protect privacy (e.g., 'John Doe' becomes 'John D.').\n\nstatus: If either the 'symptoms' or 'patient_name' fields are missing or null in the input, set this to 'REJECT'. Otherwise, set it to 'PASS'.\n\npriority: Evaluate the symptoms. If they list life-threatening or emergency issues like severe chest pain, heavy bleeding, or difficulty breathing, set this to 'CRITICAL'. Otherwise, set it to 'ROUTINE'.\n\nrejection_reason: If status is REJECT, write a short sentence explaining what information is missing. If status is PASS, set this to null.\"\n\nInput Data:\n{{ JSON.stringify($json.output) }}\n\nCRITICAL: Return ONLY a raw JSON object. Do NOT include any introductory or concluding text. Do NOT wrap your response in markdown code blocks like ```json. Your response must start with '{' and end with '}'.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        512,
+        0
+      ],
+      "id": "590eadba-c97a-48f0-b9f9-8fc828dd3895",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        240
+      ],
+      "id": "824f78e5-e815-475a-a142-8d33d2d21a76",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "18eEqEuAV0243BcZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = JSON.parse($input.item.json.output);\nreturn { json: data };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        0
+      ],
+      "id": "fae84809-2952-420e-b92c-f14221933f37",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c69662d3-82e6-41a5-aa12-80375ea50a50",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "PASS",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "30675ee7-c3aa-4e4b-b843-f873df15b0b8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are the final medical triage approver. Write a concise, 3-bullet-point clinical hand-off note for the attending physician. Keep it highly professional. Do not include any introductory text, just the notes.\n\nPatient Name: {{ $json.sanitized_name }}\nTriage Priority: {{ $json.priority }}\nSymptoms: {{ $('Information Extractor').first().json.output.symptoms }}\nDuration: {{ $('Information Extractor').first().json.output.duration }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1424,
+        -144
+      ],
+      "id": "5c63023e-f8bd-4f58-a4cf-7db81e0e1df9",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1424,
+        304
+      ],
+      "id": "81f7f663-ae41-4f72-a95b-baa50df56a9b",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "18eEqEuAV0243BcZ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "lightbringer1906@gmail.com",
+        "subject": "=APPROVED: New Triage Alert - {{ $('If').item.json.sanitized_name }} - {{ $('If').item.json.priority }}",
+        "emailType": "text",
+        "message": "=The following clinical triage note has been processed by the automated system and manually approved by the Assistant Doctor:\n\n{{ $('AI Agent1').item.json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2128,
+        -144
+      ],
+      "id": "2fc98a53-c11b-436b-9749-c0a1c0235020",
+      "name": "Send a message",
+      "webhookId": "c20a88f6-2645-4b91-b783-ddcf6a39ef3b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vIIVtrDtHvttYKE3",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "nithish2370014@ssn.edu.in",
+        "subject": "Action Required: Missing Triage Information",
+        "emailType": "text",
+        "message": "=Hello,  We received your triage request, but we cannot process it yet. {{ $json.rejection_reason }}  Please reply with the missing details so we can evaluate your priority.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        96
+      ],
+      "id": "4bc6800f-0424-4309-a93a-e771ff82f41f",
+      "name": "Send a message1",
+      "webhookId": "151c825a-5c57-4b52-8fb3-68dab9087dbb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vIIVtrDtHvttYKE3",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1952,
+        -144
+      ],
+      "id": "671c8ea3-a9b5-489d-a847-202f73c0c009",
+      "name": "Wait",
+      "webhookId": "477d27fe-66d7-423b-8e7b-524c86ad6188"
+    },
+    {
+      "parameters": {
+        "sendTo": "nithish1906@gmail.com",
+        "subject": "=PENDING APPROVAL: Triage Note for {{ $('If').item.json.sanitized_name }}",
+        "emailType": "text",
+        "message": "=Hello Assistant Doctor,\n\nPlease review the following AI-generated clinical note submitted by the patient:\n\n{{ $('AI Agent1').item.json.output }}\n\nIf this assessment is accurate, click the secure link below to approve and automatically forward this hand-off note to the Senior Doctor:\n{{ $execution.resumeUrl }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        -144
+      ],
+      "id": "f6b26d89-f678-4b2f-8d61-95f90a440eb1",
+      "name": "Send a message2",
+      "webhookId": "fea27d9d-f044-4aef-a202-9be8bc51a00a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "vIIVtrDtHvttYKE3",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c1ddb4c4-5593-452e-bd30-23d7e73835c5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3b93c401094cef3b5a97dd8b02301ff8517674dcaff649ece1a2a4139285855"
+  },
+  "id": "3acTywOkgYr9qPDz",
+  "tags": []
+}
