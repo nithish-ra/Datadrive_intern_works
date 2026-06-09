@@ -1,0 +1,163 @@
+{
+  "name": "agno+n8n",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "discharge-request",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "13d8d4c2-2612-4d99-b293-27c1a98513c5",
+      "name": "Webhook",
+      "webhookId": "1bc67b8f-e83f-4f2d-9b74-c1e6e36e4634"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/evaluate_discharge",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=patient_id",
+              "value": "={{ $json.body.patient_id }}"
+            },
+            {
+              "name": "=condition",
+              "value": "={{ $json.body.condition }}"
+            },
+            {
+              "name": "=medications",
+              "value": "={{ $json.body.medications }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8ef558a0-b2f5-49b8-adbc-af47ab8afd55",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4c881808-f567-46f2-8ab0-8e7025f78cf1",
+              "leftValue": "={{ $json.discharge_approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "21ef74b3-0459-44e0-b67d-58cc5af25629",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -112
+      ],
+      "id": "8480a53b-9220-4c01-ac74-44a7ca9e91b2",
+      "name": "Log Approved Discharge"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        672,
+        128
+      ],
+      "id": "4a05b977-5710-4eef-bb0a-09d11c84ed15",
+      "name": "Send Urgent Alert"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Log Approved Discharge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Urgent Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3ebcce56-eeec-4a26-87b0-469441809451",
+  "meta": {
+    "instanceId": "f3b93c401094cef3b5a97dd8b02301ff8517674dcaff649ece1a2a4139285855"
+  },
+  "id": "OMyFILedJmRTYMkV",
+  "tags": []
+}
