@@ -35,3 +35,35 @@ Navigate to the frontend directory and install dependencies:
 cd frontend
 npm install
 npm run dev
+
+### 3. Backend Setup (n8n)
+Open your n8n workspace.
+
+Click Workflow -> Import from File.
+
+Select the n8n_clinical_triage_workflow.json file included in this repository.
+
+Update the following credentials inside the n8n nodes:
+
+Google Sheets Node: Connect your Google account and select your specific EHR spreadsheet.
+
+Slack Nodes: Paste your specific Slack Webhook URLs for both the Standard and Emergency channels.
+
+Message a Model Node: Ensure your Gemini API credentials are connected.
+
+Click Activate (or Execute) to set the Webhook to listening mode.
+
+🧪 Testing the Pipeline (Demo Protocol)
+To verify the system is working, launch the React canvas and run the following tests:
+
+Test 1: Standard Routine Check
+
+Input: Patient ID: PAT-001 | Symptoms: Mild dry cough for two days. No fever.
+
+Expected Result: The system retrieves patient history, logs the new visit, calculates Severity: STANDARD, and sends a formatted summary to the routine Slack channel.
+
+Test 2: Emergency Escalation (Safety Override)
+
+Input: Patient ID: PAT-999 | Symptoms: Severe crushing chest pain radiating to left arm.
+
+Expected Result: The system triggers the Safety Override rule, calculates Severity: CRITICAL, bypasses standard routing, and fires a red-alert @channel notification to the emergency Slack channel.
