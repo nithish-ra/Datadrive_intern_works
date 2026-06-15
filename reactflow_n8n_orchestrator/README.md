@@ -6,7 +6,7 @@ An intelligent, multi-agent orchestration system designed to automate clinical t
 
 This project decouples the user interface from the backend orchestration, allowing for a highly scalable, dynamic workflow. 
 
-![React Flow UI Canvas](assets/react-ui.png)
+![React Flow UI Canvas](assets/react-ui.png.png)
 *Above: The React Flow drag-and-drop frontend interface.*
 
 * **Frontend:** React Flow (Drag-and-drop node canvas for UI interaction)
@@ -19,7 +19,7 @@ This project decouples the user interface from the backend orchestration, allowi
 
 ## ✨ Key Features
 
-![n8n Backend Logic](assets/n8n-workflow.png)
+![n8n Backend Logic](assets/n8n-workflow.png.png)
 *Above: The n8n backend dynamically routing the triage data.*
 
 1. **Dynamic Routing (Switch & If Logic):** Automatically directs workflows based on the type of agent triggered in the UI (e.g., API Lookup vs. Reasoning Agent).
