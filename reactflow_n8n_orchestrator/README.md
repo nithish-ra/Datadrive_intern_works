@@ -6,13 +6,21 @@ An intelligent, multi-agent orchestration system designed to automate clinical t
 
 This project decouples the user interface from the backend orchestration, allowing for a highly scalable, dynamic workflow. 
 
+![React Flow UI Canvas](assets/react-ui.png)
+*Above: The React Flow drag-and-drop frontend interface.*
+
 * **Frontend:** React Flow (Drag-and-drop node canvas for UI interaction)
 * **Orchestration Engine:** n8n (Handles logic routing, API calls, and data mapping)
 * **Reasoning Agent:** Google Gemini (Processes clinical notes and outputs structured JSON)
 * **Database / Memory:** Google Sheets (Acts as a mock Electronic Health Record [EHR] to store and retrieve patient history)
 * **Notification Engine:** Slack (Multi-channel routing for standard logs and emergency alerts)
 
+---
+
 ## ✨ Key Features
+
+![n8n Backend Logic](assets/n8n-workflow.png)
+*Above: The n8n backend dynamically routing the triage data.*
 
 1. **Dynamic Routing (Switch & If Logic):** Automatically directs workflows based on the type of agent triggered in the UI (e.g., API Lookup vs. Reasoning Agent).
 2. **Contextual Medical Memory:** Queries previous patient encounters before making a triage decision, allowing the AI to determine if a condition has escalated.
@@ -20,6 +28,8 @@ This project decouples the user interface from the backend orchestration, allowi
 4. **Automated Escalation:** * **Standard Path:** Logs routine symptoms to a standard dashboard channel.
    * **Critical Path:** Triggers a high-priority `@channel` alert in an emergency Slack channel.
 5. **Strict JSON Enforcement:** Forces the LLM to output cleanly parsed JSON to prevent pipeline crashes during logic evaluation.
+
+---
 
 ## 🚀 Setup Instructions
 
@@ -35,8 +45,8 @@ Navigate to the frontend directory and install dependencies:
 cd frontend
 npm install
 npm run dev
-
-### 3. Backend Setup (n8n)
+```
+3. Backend Setup (n8n)
 Open your n8n workspace.
 
 Click Workflow -> Import from File.
